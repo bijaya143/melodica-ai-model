@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pickle
 import numpy as np
@@ -7,10 +8,18 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
 # pip install fastapi uvicorn // Packages
-# uvicorn app:app --reload // Run Command
+# uvicorn recommendation:app --reload // Run Command
 
 # Initialize FastAPI
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 # Initialize Spotify client
 CLIENT_ID = "70a9fb89662f4dac8d07321b259eaad7"
@@ -34,17 +43,16 @@ class SongSelection(BaseModel):
     selected_song: str
 
 # Function to get recommendations
-def get_recommendations(selected_song, df, similarity, top_n=5):
+def get_recommendations(selected_song, df, similarity, top_n=10):
     try:
         song_idx = df[df['track_name'] == selected_song].index[0]
     except IndexError:
-        return [], []
+        return []
 
     similarity_scores = similarity[song_idx].toarray()[0]
     sorted_indices = np.argsort(similarity_scores)[::-1]
 
     recommended_songs = []
-    recommended_posters = []
     seen = set()
     total_recommendations = 0
 
@@ -58,8 +66,13 @@ def get_recommendations(selected_song, df, similarity, top_n=5):
 
         if song_key not in seen:
             seen.add(song_key)
-            recommended_songs.append(song['track_name'])
-            recommended_posters.append(get_song_album_cover_url(song['track_name'], song['artists']))
+            song_info = {
+                "title": song['track_name'],
+                "imageUrl": get_song_album_cover_url(song['track_name'], song['artists']),
+                "artist": song['artists'],
+                "similarity_score": similarity_scores[idx]
+            }
+            recommended_songs.append(song_info)
             total_recommendations += 1
 
     # If there are not enough unique songs, add the closest songs until the quota is filled
@@ -72,16 +85,25 @@ def get_recommendations(selected_song, df, similarity, top_n=5):
             song_key = (song['track_name'], song['artists'])
 
             # Re-add songs even if they are repeated
-            recommended_songs.append(song['track_name'])
-            recommended_posters.append(get_song_album_cover_url(song['track_name'], song['artists']))
+            song_info = {
+                "title": song['track_name'],
+                "imageUrl": get_song_album_cover_url(song['track_name'], song['artists']),
+                "artist": song['artists'],
+                "similarity_score": similarity_scores[idx]
+            }
+            recommended_songs.append(song_info)
             total_recommendations += 1
 
     # Fill the remaining spots with a fallback image if still not enough recommendations
     while len(recommended_songs) < top_n:
-        recommended_songs.append("No more recommendations")
-        recommended_posters.append("https://i.postimg.cc/0QNxYz4V/social.png")
+        recommended_songs.append({
+            "title": "No more recommendations",
+            "imageUrl": "https://i.postimg.cc/0QNxYz4V/social.png",
+            "artist":"",
+            "similarity_score": 0
+        })
 
-    return recommended_songs, recommended_posters
+    return recommended_songs
 
 # Function to get album cover URL
 def get_song_album_cover_url(song_name, artist_name):
@@ -112,12 +134,9 @@ async def get_options(search_query: SearchQuery):
 @app.post("/get_recommendations")
 async def get_song_recommendations(song_selection: SongSelection):
     df, similarity = load_data()
-    recommended_songs, recommended_posters = get_recommendations(song_selection.selected_song, df, similarity)
+    recommended_songs = get_recommendations(song_selection.selected_song, df, similarity)
     
     if recommended_songs:
-        return {
-            "recommended_songs": recommended_songs,
-            "recommended_posters": recommended_posters
-        }
+        return {"recommended_songs": recommended_songs}
     else:
         raise HTTPException(status_code=404, detail="No recommendations available")
