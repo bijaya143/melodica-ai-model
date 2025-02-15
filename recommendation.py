@@ -43,7 +43,7 @@ class SongSelection(BaseModel):
     selected_song: str
 
 # Function to get recommendations
-def get_recommendations(selected_song, df, similarity, top_n=5):
+def get_recommendations(selected_song, df, similarity, top_n=10):
     try:
         song_idx = df[df['track_name'] == selected_song].index[0]
     except IndexError:
