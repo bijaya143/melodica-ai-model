@@ -56,6 +56,6 @@ The **Mood-Based Music Recommendation System** is a project that utilizes machin
 ## 📊 Dataset
 
 - The dataset used for training and recommendations is sourced from **Kaggle’s Spotify dataset**.
-- It includes features such as **loudness, valence, speechiness, danceability, acousticness, and more**.
+- It includes features such as **loudness, valence, speechiness, key, acousticness, and more**.
 
 _🎵 Find the perfect music for your mood!_ 🎶
