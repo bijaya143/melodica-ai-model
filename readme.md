@@ -50,7 +50,7 @@ The **Mood-Based Music Recommendation System** is a project that utilizes machin
 
 2. Run the server:
    ```bash
-   python app.py
+   uvicorn recommendation:app --reload
    ```
 
 ## 📊 Dataset
