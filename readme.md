@@ -28,7 +28,7 @@ The **Mood-Based Music Recommendation System** is a project that utilizes machin
 │── 📂 outdated-models/                 # Machine learning models
 │── 📜 requirements.txt        # Python dependencies
 │── 📜 README.md               # Project documentation
-│── 📜 app.py                  # API entry point
+│── 📜 recommendation.py                  # API entry point
 │── 📜 model_training.ipynb    # Jupyter notebook for ML training
 ```
 
