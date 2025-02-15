@@ -45,7 +45,7 @@ The **Mood-Based Music Recommendation System** is a project that utilizes machin
 
    ```bash
    git clone https://github.com/bijaya143/melodica-ai-model
-   cd mood-music-recommendation
+   cd melodica-ai-model
    ```
 
 2. Run the server:
