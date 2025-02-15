@@ -26,7 +26,6 @@ The **Mood-Based Music Recommendation System** is a project that utilizes machin
 📁 mood-music-recommendation
 │── 📂 dataset/                # Music dataset (CSV files)
 │── 📂 outdated-models/                 # Machine learning models
-│── 📂 frontend/               # Frontend React app
 │── 📜 requirements.txt        # Python dependencies
 │── 📜 README.md               # Project documentation
 │── 📜 app.py                  # API entry point
