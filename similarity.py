@@ -27,7 +27,7 @@ with open(pickle_file_path, "rb") as f:
 print(f"Dataset loaded with shape: {data.shape}")
 
 # Step 2: Select relevant features for similarity calculation
-features = ['valence', 'loudness', 'valence', 'tempo', 'acousticness']  # Modify as needed
+features = ['valence', 'loudness', 'key', 'tempo', 'acousticness']  # Modify as needed
 print(f"Using features for similarity: {features}")
 if not all(feature in data.columns for feature in features):
     raise ValueError("Some selected features are not present in the dataset!")
